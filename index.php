@@ -30,11 +30,13 @@ function cloudinary($url, $params = [])
     $defaults  = array_merge($defaults, option('cloudinary.defaults', []));
 
     $params  = array_merge($defaults, $params);
+    unset($params['crop']);
     $options = [];
 
     $map = [
         'width'   => 'w',
         'height'  => 'h',
+        'crop'  => 'c',
     ];
 
     foreach ($params as $key => $value) {
