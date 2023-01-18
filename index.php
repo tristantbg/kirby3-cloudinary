@@ -4,7 +4,7 @@ use Kirby\Cms\App;
 use Kirby\Cms\File;
 use Kirby\Cms\FileVersion;
 
-function cloudinary($url, $params = [])
+function cloudinary($url, $params = [], $type = 'image')
 {
     if (is_object($url) === true) {
         $url = $url->url();
@@ -27,6 +27,15 @@ function cloudinary($url, $params = [])
         'c' => 'fill',
         'cs' => 'srgb'
     ];
+
+    if ($type == 'video') {
+      $defaults = [
+        'q' => 'auto:eco',
+        'f' => 'mp4',
+        'w'   => 1600
+      ];
+    }
+
     $defaults  = array_merge($defaults, option('cloudinary.defaults', []));
 
     $params  = array_merge($defaults, $params);
@@ -49,7 +58,7 @@ function cloudinary($url, $params = [])
 
     $options = implode(',', $options);
 
-    return 'https://res.cloudinary.com/'. option('cloudinary.cloudname') .'/image/upload/'. $options . '/' . option('cloudinary.folder') . '/' . $url;
+    return "https://res.cloudinary.com/". option("cloudinary.cloudname") ."/$type/upload/". $options . "/" . option("cloudinary.folder") . "/" . $url;
 
 }
 
@@ -84,6 +93,9 @@ Kirby::plugin('getkirby/cloudinary', [
             if (option('cloudinary', false) !== false) {
                 if ($file->type() === 'image') {
                     return cloudinary($file->mediaUrl());
+                }
+                if ($file->type() === 'video' && $file->filename() != 'addpmp.mp4') {
+                    return cloudinary($file->mediaUrl(), [], 'video');
                 }
                 return $file->mediaUrl();
             }
